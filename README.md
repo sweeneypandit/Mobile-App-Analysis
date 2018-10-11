@@ -42,6 +42,7 @@ Language number supported by app, prime genre,price variables hold most importan
 ------------------------------------------------------ Best Model---------------------------------------------------------
 My best model is random forest with least rmse 1.30 and good% prediction of 72 followed by ksvm, svm.
 
+Descriptive analysis
 
 
 
