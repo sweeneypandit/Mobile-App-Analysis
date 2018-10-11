@@ -17,9 +17,9 @@ df$rating<-0
 badrating<-which(df$user_rating< mean_rating)
 #getting the index value for user rating above mean
 goodrating<-which(df$user_rating> mean_rating)
-#giving value 0 for bad ozone where user rating is below mean level
+#giving value 0 for bad rating where user rating is below mean level
 df[badrating,18]<-"0"
-#giving value 1 for good ozone where user rating is above mean level
+#giving value 1 for good rating where user rating is above mean level
 df[goodrating,18]<-"1"
 #copying dataset to df1
 df1<-df
@@ -44,7 +44,7 @@ results<-table(ksvmPred,testData$rating)
 print(results)
 
 
-#calculating percent correct predicted goodozone
+#calculating percent correct predicted goodrating
 perGoodrating <- (results[1,1]+results[2,2])/(results[1,1]+results[1,2]+results[2,1]+results[2,2])*100
 #rounding the result
 round(perGoodrating)
@@ -56,7 +56,7 @@ svmPred<- predict(svmOutput,testData)
 #tabulating the results
 results<-table(svmPred,testData$rating)
 print(results)
-#calculating percent correct predicted goodozone
+#calculating percent correct predicted goodrating
 perGoodrating <- (results[1,1]+results[2,2])/(results[1,1]+results[1,2]+results[2,1]+results[2,2])*100
 #rounding the result
 round(perGoodrating)
@@ -68,13 +68,13 @@ nbPred<- predict(nbOutput,testData)
 #tabulating the results
 results<-table(nbPred,testData$rating)
 print(results)
-#calculating percent correct predicted goodozone
+#calculating percent correct predicted goodrating
 perGoodrating <- (results[1,1]+results[2,2])/(results[1,1]+results[1,2]+results[2,1]+results[2,2])*100
 #rounding the result
 round(perGoodrating)
-
+df1$ver<-as.numeric(df1$ver)
 #Trying random forest
-rfOutput <- randomForest(user_rating ~ver+price+lang.num+cont_rating+vpp_lic+sup_devices.num+ipadSc_urls.num+cont_rating+prime_genre+size_bytes
+rfOutput <- randomForest(rating ~ver+price+lang.num+cont_rating+vpp_lic+sup_devices.num+ipadSc_urls.num+cont_rating+prime_genre+size_bytes
                          , data=trainData,ntree = 5000, importance = TRUE)
 #predicting testdata from random forest 
 rfPred <- predict(rfOutput,testData)
@@ -82,6 +82,10 @@ rfPred <- predict(rfOutput,testData)
 results<-table(rfPred,testData$rating)
 #print results
 print(results)
+#calculating percent correct predicted goodrating
+perGoodrating <- (results[1,1]+results[2,2])/(results[1,1]+results[1,2]+results[2,1]+results[2,2])*100
+#rounding the result
+round(perGoodrating)
 importance(rfOutput)
 
 # predicting  original continuous data of user rating along with variable importance
@@ -98,7 +102,7 @@ rmse(error)
 #variable importance
 VarImportance<-Importance(model,trainData,method = "sens")
 #plotting the graph for variable importance
-L=list(runs=1,sen=t(VarImportance$imp),sresponses=VariableImportance$sresponses)
+L=list(runs=1,sen=t(VarImportance$imp),sresponses=VarImportance$sresponses)
 mgraph(L,graph="IMP",leg=names(trainData),col="red")
 #using svm model
 model=fit(user_rating~ver+lang.num+price+cont_rating+vpp_lic+sup_devices.num+ipadSc_urls.num+cont_rating+prime_genre+size_bytes,trainData,model="svm")
@@ -111,7 +115,7 @@ rmse(error)
 #variable importance
 VarImportance<-Importance(model,trainData,method = "sens")
 #plotting the graph for variable importance
-L=list(runs=1,sen=t(VarImportance$imp),sresponses=VariableImportance$sresponses)
+L=list(runs=1,sen=t(VarImportance$imp),sresponses=VarImportance$sresponses)
 mgraph(L,graph="IMP",leg=names(trainData),col="blue")
 #Trying random forest
 model=fit(user_rating~ver+lang.num+price+cont_rating+vpp_lic+sup_devices.num+ipadSc_urls.num+cont_rating+prime_genre+size_bytes,trainData,model="randomForest")
@@ -124,7 +128,7 @@ rmse(error)
 #variable importance
 VarImportance<-Importance(model,trainData,method = "sens")
 #plotting the graph for variable importance
-L=list(runs=1,sen=t(VarImportance$imp),sresponses=VariableImportance$sresponses)
+L=list(runs=1,sen=t(VarImportance$imp),sresponses=VarImportance$sresponses)
 mgraph(L,graph="IMP",leg=names(trainData),col="green")
 ----------------------------------------------------------------
 #interpretation
@@ -133,4 +137,11 @@ mgraph(L,graph="IMP",leg=names(trainData),col="green")
 #best model is random forest with least rmse 1.30 and good% prediction of 72 followed by ksvm, svm
   ---------------------------------------------------------------
 #descriptive analysis
-
+#scatter plot with lang num and price affect over user rating  
+ggplot(df1, aes(x=df1$lang.num, y=df1$user_rating)) + geom_point()
+ggplot(df1,aes(x=df1$price,y=df1$user_rating))+ geom_point()
+#grouping acc to prime f=genre and user rating
+df2<-sqldf('select count(df1.prime_genre), df1.prime_genre, df1.user_rating
+from df1 group by df1.user_rating')
+#plotting analysis
+ggplot(df2, aes(x=df2$prime_genre, y=df2$`count(df1.prime_genre)`, colour=df2$user_rating)) + geom_line(size=10)
