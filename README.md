@@ -44,8 +44,12 @@ My best model is random forest with least rmse 1.30 and good% prediction of 72 f
 
 Descriptive analysis
 
+I created 3 simple visual analysis using ggplot for the variable importance affecting user rating
+1) Scatter plot between language number and user rating - here I found that the majority language number offered less than 20 tend to have higher user rating so there is some pattern that affects app rating which was also concluded by the variable importance of the model
 
+2)Scatter plot between price and user rating - As excpected the lower the price of the app the higher is the trend of app rating which is not new and also strongly affected in the model
 
+3) Barplot between prime genre and rating- 
                  
                  
                  
