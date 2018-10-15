@@ -54,5 +54,6 @@ also is somewhat biased towards rating.
                  
                  
                  
-                 
+****** You would need to have R studio installed in the system to run this script****************************************
+Thank you
                  
